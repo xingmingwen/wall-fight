@@ -6,7 +6,7 @@
         <div id="goods_wall">
         </div>
 
-        <div class="loading">
+        <div class="loading center-block">
             <img src="{{static_url("img/loading.gif")}}">  
         <div>
         <!-- contains the content to be loaded when scrolled -->
@@ -29,7 +29,7 @@
     $goods_wall.imagesLoaded(function(){
       $goods_wall.masonry({
         itemSelector: '.box',
-        columnWidth: 50,
+        columnWidth: 25,
       });
     });
 

@@ -6,6 +6,7 @@ import tornado.web
 import requests
 import json
 import os
+import re
 from tornado.options import define, options
 
 define("port", default=80, help="run on the given port", type=int)
@@ -17,26 +18,43 @@ CSS_PATH='static/CSS/'
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render(TPL_PATH + '/waterfall.html');
+nt = ""
+def get_next_nt():
+    url = "http://www.meilishuo.com/guang/hot?frm=daeh"
+    resp = requests.get(url)
+    return re.findall("nt : '(\S+)'", resp.content)[0]
 
 class AjaxHandler(tornado.web.RequestHandler):
     def get(self):
+        global nt
+        if not nt:
+            nt = get_next_nt()
         page = self.get_argument('page')
         url =  'http://www.meilishuo.com/aj/getGoods/goods?frame={frame}&page={page}&view=1&word_name=hot&section=hot&price=all'
         url = url.format(frame=int(page)%8, page=int(page)/8)
-        headers = {
-                'nt':'1yQyN1tU7ssTVQ5GeZ16w7Jkz0CE8+w68rWPgeCdXIIBJrEDYJ6rK9nzwdVWu7su',
-                'Referer':'http://www.meilishuo.com/guang/hot?frm=daeh'
-        }
-        img_url = 'http://d05.res.meilishuo.net/pic/_o/e0/19/72747b42b08fb915355206251331_640_900.c6.jpg_83ced05d_s7_450_680.jpg'
-        htcontent = requests.get(url, headers=headers).json()
+        try:
+            headers = {
+                    'nt':nt,
+                    'Referer':'http://www.meilishuo.com/guang/hot?frm=daeh'
+            }
+            htcontent = requests.get(url, headers=headers).json()
+        except Exception, exp:
+            nt = get_next_nt()
+            headers = {
+                    'nt':nt,
+                    'Referer':'http://www.meilishuo.com/guang/hot?frm=daeh'
+            }
+            htcontent = requests.get(url, headers=headers).json()
+
         content = ""
         for item in htcontent['tInfo']:
             img_url = item['show_pic']
             link = 'http://www.meilishuo.com/share/item/%s' % item['twitter_id']
             likes = item['count_like']
             sold = item['sale_num']
+            price = item['ginfo']['goods_price']
             #content += "<div class='box'><a href={link}><img src={img_url}></a></div>".format(img_url=img_url, link=link)
-            kvs = dict(img_url=img_url, link=link, likes=likes, sold=sold)
+            kvs = dict(img_url=img_url, link=link, likes=likes, sold=sold, price=price)
             content += self.render_string(TPL_PATH + '/waterfall.box.html', **kvs)  
         self.write(content)
         self.finish()

@@ -1,13 +1,16 @@
-<div class='box'>
+<div class='box' style='margin:0 5px 5px 0;'>
     <div class='img_holder'>
-        <a href={{link}}><img src={{img_url}} class='img-rounded'></a>
+        <a href={{link}} target="_blank"><img src={{img_url}} class='img-rounded'></a>
+        <span class='price badge' style='z-index:100;right:0;top:260px;position:absolute'>{{price}}</span>
     </div>
-    <div class='row'>
-        <div class='col-xs-6'>
-            喜欢数:<span class='likes' stype="line-height:22px">{{likes}}</span>
+
+    <div class='row' style='padding: 2.5px'>
+        <div class='col-md-7 text-left'>
+            <span class='glyphicon glyphicon-heart-empty label label-danger'>喜欢</span><span class='likes badge'>{{likes}}</span>
         </div>
-        <div class='col-xs-6 col-md-6'>
-            销量:<span class='sold' stype="line-height:22px">{{sold}}</span>
+
+        <div class='col-md-5 text-right'>
+            <span>销量(<span class='sold'>{{sold}}</span>)</span>
         </div>
     </div>
 </div>

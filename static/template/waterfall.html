@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block container %}
+        <div id="rec_nav">
+        </div>
+
+        <div id="goods_wall">
+        </div>
+
+        <div class="loading">
+            <img src="{{static_url("img/loading.gif")}}">  
+        <div>
+        <!-- contains the content to be loaded when scrolled -->
+        <div id="page-nav">
+          <a href="next?page=1"></a>
+        </div>
+{% end %}
+
+{% block footer %}
+<script>
+  $(function(){
+    var $goods_wall = $('#goods_wall');
+    $.ajax({
+            url:'next?page=1',
+            async:false,
+            success:function($data) {
+                $goods_wall.append($data);
+            },
+    }); 
+    $goods_wall.imagesLoaded(function(){
+      $goods_wall.masonry({
+        itemSelector: '.box',
+        columnWidth: 50,
+      });
+    });
+
+    $goods_wall.infinitescroll({
+      navSelector  : '#page-nav',    // selector for the paged navigation
+      nextSelector : '#page-nav a',  // selector for the NEXT link (to page 2)
+      itemSelector : '.box',     // selector for all items you'll retrieve
+      loading: {
+          msgText:"loading......",
+          finishedMsg: 'No more pages to load.',
+          selector: '.loading',
+        }
+      },
+      function( newElements ) {
+        var $newElems = $( newElements ).css({ opacity: 0 });
+        $newElems.imagesLoaded(function(){
+          $newElems.animate({ opacity: 1 });
+          $goods_wall.masonry( 'appended', $newElems, true );
+        });
+      }
+    );
+  });
+</script>
+
+{% end %}
